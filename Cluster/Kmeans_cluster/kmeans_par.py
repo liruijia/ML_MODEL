@@ -3,7 +3,7 @@
  @Author : RuiJia Li 
  @Time   : 2021/1/27 10:27
  @File   : kmeans_par.py
- @Desc   : 实现一下kmeans吧 主要是好久没有写过机器学习算法了，从最简单的开始吧
+ @Desc   : 
 '''
 '''
 input: 一组没有label的数据集
