@@ -1,5 +1,4 @@
 #coding : utf-8
-# 加载代扣解约数据集
 
 
 import pandas  as pd
@@ -54,8 +53,8 @@ def get_cut_text(textwords):
 
 
 if __name__ == '__main__':
-    abs_input_path='C:/Users/bdruijiali/Desktop/团队/data/activity_relate/BTM/input'
-    abs_output_path = 'C:/Users/bdruijiali/Desktop/团队/data/activity_relate/BTM/output'
+    abs_input_path='**'
+    abs_output_path = '**'
     jieba.load_userdict(abs_input_path+'/代扣词典.txt')
     path = abs_input_path+'/train.csv'
     train = pd.read_csv(path,engine='python')
