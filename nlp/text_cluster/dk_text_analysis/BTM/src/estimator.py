@@ -1,12 +1,5 @@
 # -*- coding: utf-8 -*-
 '''
-   模型的评估预测，主要是想要训练模型的两个参数 topic 、 iteration
-   不断地去预测不同主题下、不同iteration下的umass值，  umass值衡量了一个topic下，词汇的相似度，因此该值越小越好
-
-   对于LDA模型来说，在gensim下有topic-coherence函数来帮助进行模型的评估，其topic_coherence 指标有两类 ，c_v 和 c_umass
-   c_v 取最大 c_umass取最小
-
-   需要每一次的pw_z的结果就好，不断地进行训练模型
    :param : pw_z
    :param : doc_dir
    :return : topic_coherence_list  plot
