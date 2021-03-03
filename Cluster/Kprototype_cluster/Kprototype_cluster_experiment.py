@@ -9,13 +9,6 @@ from sklearn.datasets import load_iris
 from sklearn.metrics import accuracy_score
 from collections import Counter ,defaultdict
 
-'''
-需要的参数有：
-    样本集x  （一条样本 = 离散型 + 连续型）
-    离散型变量和连续性变量的界限 
-    
-    需要提前定义的函数有，连续性变量的相似度  离散型变量的相似度
-'''
 
 def get_similar_continus(x1,x2):
     return np.sqrt(sum((x1-x2)**2))
@@ -45,13 +38,9 @@ def get_dissimilar_huang_cao(x1,x2,A,y2_label):
     return dissim
 
 def find_proto_column(data,K):
-    # 用来去寻找data中的离散列 数值列等等 其只需要判断每一个列的一个元素就好，不需要全部都判断
-    # 最后得到所有的连续型列， 离散型列， 连续型样本 ，离散型样本， 簇中心的离散部分以及连续部分
-    # 如何判断一个
     continus_column=[]
     object_column = []
     num = random.sample(range(len(data)),K)
-    # 这种方式并不能够将 辨别出来数值型的分类变量，其将其认为是 连续型的变量
     # for i in range(len(data[0,:])):
     #     if isinstance(data[0,i],int)  or isinstance(data[0,i],float) :
     #         continus_column.append(i)
@@ -60,7 +49,6 @@ def find_proto_column(data,K):
     #     else :
     #         raise ValueError ('the value-type of x[{0}] is error'.format(i))
 
-    #  判断的时候，每次判断的 考虑 元素的类型 以及 整个变量所对应的值的情况，主要是针对于int类型的情况进行考虑
 
     for  i in range(len(data[0,:])):
         if isinstance(data[0,i],float):
