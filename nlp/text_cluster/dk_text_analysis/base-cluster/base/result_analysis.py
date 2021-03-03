@@ -9,7 +9,7 @@ import numpy as np
 mpl.rcParams['font.sans-serif'] = ['FangSong'] # 指定默认字体
 mpl.rcParams['axes.unicode_minus'] = False # 解决保存图像是负号'-'显示为方块的问题
 
-abs_path = 'C:/Users/bdruijiali/Desktop/团队/data/activity_relate/dk_henan_pay/use_python_analysis/output_data/'
+abs_path = 'activity_relate/dk_henan_pay/use_python_analysis/output_data/'
 key_words_path = abs_path + 'keyword_result.csv'
 key_word_df = pd.read_csv(key_words_path,engine='python')
 key_words = key_word_df['keyword'].values.tolist()
