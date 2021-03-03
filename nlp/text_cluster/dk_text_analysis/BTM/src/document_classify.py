@@ -1,6 +1,4 @@
-# 利用BTM 模型进行文档的分类
-# 主要是获取到document - topic 分布即可进行相应的分类了
-#
+
 
 def display_keyword_of_document(corpus_text,predict_label,dictionary,pw_z_dir,topic_num,docn=20,topn=5):
     pw_z = load_pw_z(pw_z_dir,topic_num)
