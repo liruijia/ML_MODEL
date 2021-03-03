@@ -17,7 +17,7 @@ import re
 from zhon.hanzi import punctuation
 import time
 import itertools
-import collections as Counter   # 不知道 为什么是用不了了
+import collections as Counter   
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import pyLDAvis.gensim
@@ -28,22 +28,19 @@ from sklearn.metrics import calinski_harabasz_score , silhouette_score
 mpl.rcParams['font.sans-serif'] = ['FangSong'] # 指定默认字体
 mpl.rcParams['axes.unicode_minus'] = False # 解决保存图像是负号'-'显示为方块的问题
 
-abs_input_path='C:/Users/bdruijiali/Desktop/团队/data/activity_relate/dk_text_analysis/base_cluster/input_data'
-abs_output_path = 'C:/Users/bdruijiali/Desktop/团队/data/activity_relate/dk_text_analysis/base_cluster/output_data'
+abs_input_path='activity_relate/dk_text_analysis/base_cluster/input_data'
+abs_output_path = 'activity_relate/dk_text_analysis/base_cluster/output_data'
 jieba.load_userdict(abs_input_path+'/代扣词典.txt')
 path = abs_input_path+'/train.csv'
 train = pd.read_csv(path,engine='python')
 print(train.head())
 
-## 数据处理 ，针对 code 做分类 --好久没有写python的后果就是，脑袋有坑 明明数据处理可以两行代码搞定 还要一直在那里写for循环
 
 map_x = {1:'缴费失败',2:'担心资金安全',3:'更换住处',4:'其他',5:'手误签约',6:'缴费重复'}
 train['feedback_mess_total']=train['feedback_msg']
 train.loc[train['feedback_msg']=='missing','feedback_mess_total']=train.loc[train['feedback_msg']=="missing",
                                                                        'feedback_code'].map(map_x)
 
-## 添加 数据清洗的过程 ， 针对那些 code 不为 4 且 msg 只为数据的 msg进行替换，使用填写的code 所要映射的信息进行替换
-# 对于 code =4  且 msg 无用的 情况，使用其他进行代替
 def sentence_map(feedback_code):
     if feedback_code == 1:
         return '缴费失败'
@@ -69,7 +66,6 @@ for index, row in train.iterrows():
     elif row['feedback_mess_total']=='g?h' :
         train.loc[index,'feedback_mess_total'] = sentence_map(row['feedback_code'])
 
-## 将文本进行切分，划分为 mess_total ='其他' 和 mess_total != '其他'  在最终的结果中将这种情况作为最后一种分类补充进去
 text_words_else = train.loc[train['feedback_mess_total']=='其他',['msg_id','feedback_mess_total']]
 text_words_else0 = text_words_else['feedback_mess_total']
 text_words_noelse = train.loc[train['feedback_mess_total']!='其他',['msg_id','feedback_mess_total']]
@@ -78,7 +74,6 @@ text_words = text_words_noelse0.values
 n_nums = len(text_words)
 
 # 开始进行分词
-# 并进行词汇的过滤，停用词 ，加载停用词表 去分词的时候进行中文
 stop_path =abs_input_path+'/stop_words.txt'
 stop_words = []
 with open(stop_path , 'r', encoding = 'utf-8') as f:
@@ -91,7 +86,7 @@ stop_words.append(['元','说','了','多元','的','从','啊','10','30','100',
 cut_text=[]
 vocabulary_list = []
 
-# 将文本切分这一块写成函数形式
+
 def get_cut_text(textwords):
     text_sentence=[]
     cut_text=[]
@@ -158,11 +153,7 @@ def get_wordfrequence_and_word2cloud(cut_text,vocabulary_list):
     plt.show()
 
 get_wordfrequence_and_word2cloud(cut_text_noelse,vocabulary_list_noelse)
-## 通过词云图观察，发现更换住处、资金安全、缴费失败、缴费重复、优惠、手误、余额问题等原因占比会比较多
 
-
-##  进行词向量的获取  -- 进而进行相似度计算 最后进行文本聚类  通过词向量 求一整个句子的词向量 ， 进而进行相应的分析
-#  通过Kmeans进行文本处理分类
 
 def get_word2vec_matrix(text_sentence,cut_text,n_row,n_col=100):
     model=word2vec.Word2Vec(text_sentence,size=n_col,window=5,min_count=1)
@@ -234,27 +225,12 @@ with open(kmeans_result_path , 'w') as f :
     f.close()
 ##
 
-''' 
-16进制设置颜色 -- 16进制表示颜色 “#[0-9A-F]”
-正则产生字符串
-_x = Xeger()
-for i in range(20): 
-    testStr = _x.xeger(r'(13[0-9]|14[5|7]|15[4]|18[0-9]|17[5-8])(\d{8})')
-'''
-# mark_list = ['_','o','v','d','x','^','2','1','3','4','.','*',',','h','s','p','H','+','D','|']
-# for i ,word in enumerate(word_list_model_noelse):
-#     plt.scatter(vocabulary_word_matrix_noelse[i,0],vocabulary_word_matrix_noelse[i,5],
-#                 marker=mark_list[label_predict_kmeans_final_noelse[0][i]])
-# plt.show()
 
-# 存放每一个类别标签下的解约文本数据
 cluster_dk  = [[] for _ in range(40)]
 for  i ,  label in enumerate(label_predict_kmeans_final_noelse[0]) :
     cluster_dk[label].append(cut_text_noelse[i])
 
 # 使用tf-idf 、 ldamodel 阶段的数据处理
-# 计算词汇的tf-idf值  通过tf-idf值 提取每一个句子的关键字信息
-# 关键字 即 tf-idf值比较大的值 根据tfidf值获取每一则评论的关键字
 def get_tfidf(corpus):
     tfidf_model = TfidfModel(corpus)
     tfidf_matrix = []
@@ -265,8 +241,6 @@ def get_tfidf(corpus):
 
 tfidf_matrix_noelse,sentence_keyword_df_noelse = get_tfidf(corpus_noelse)
 
-# 进行Kmeans分析的时候，需要使用到的是矩阵，利用gensim.TfidfModel得到的matrix只给出了当前句子中的每个词的tfidf值
-# 利用得到的tfidf_matrix_noelse 进行聚类分析 后面的聚类分析结果主要是利用word2vec得到的词向量矩阵进行的
 
 matrix_row =len(corpus_noelse)
 matrix_col = 0
@@ -284,20 +258,6 @@ tfidf_clusters = 30
 tf_idf_kmeans = KMeans(n_clusters = tfidf_clusters)
 tf_idf_kmeans.fit(matrix_tfidf)
 tfidf_kmeans_predict = tf_idf_kmeans.labels_
-
-# 将聚类算法得到的结果进行合并 并进行相应的统计
-# 这个地方还缺一步对于聚类得到的结果进行分析的过程，即对于不同的类别进行命名，最后利用命名的情况进行统计分析处理
-# word2vec
-# word2vec_cluster_name = {
-#         0: '担心资金安全',
-#         1: '自动扣款额度问题',
-#         2: '缴费失败',
-#         3: '蚂蚁森林 + 扣费金额',
-#         4: '扣费顺序 + 扣费重复 +扣费失败'
-#         5: '未扣款成功'
-#         6: ''
-# }
-# 一种方法是通过上述映射进行命名，还有一种方式是通过关键字提取 对于分好类的信息进行关键字提取，
 
 
 word2vec_kmeans_predict0 = text_words_noelse
@@ -390,23 +350,14 @@ plt.imshow(model)
 plt.axis("off")
 plt.show()
 
-# 使用LDA进行主题获取 --根据得到的文档主题分布 进行聚类处理  按照其所在的最大的主题进行聚类
 model_lda =LdaModel(corpus=corpus_noelse,num_topics=22,id2word=dictionary_noelse,alpha=0.01,iterations=150)
 print(model_lda.print_topic(topicno=10,topn=5))
 
-# 得到每一个主题的分布 model_lda.get_topics()
 labels_predict_lda_noelse = []
 for i in range(len(corpus_noelse)):
     topic,prob = model_lda.get_document_topics(bow=corpus_noelse[i])[0][0],model_lda.get_document_topics(bow=corpus_noelse[i])[0][1]
     labels_predict_lda_noelse.append(topic)
-
-# 上述对于lda模型进行训练，模型评估，使用指标 ——主题一致性 topic_coherence , 该指标 主要衡量了模型训练得到的主题是否有很好的进行了聚类，是否
-# 同一主题的词汇，有很好的聚在一起  TOPIC_COHERENCE 总共包含3个主要的部分
-# 影响模型的参数有 ： iteration、num_topics 、 alpha
-# num_topics 根据之前对于数据进行分析，就暂时的情况就可以分出来25-30个类别
-# alpha 暂定为0.01  主要是按照原论文 以及 以前做的一些分析  alpha 取 0.01 的 时候结果最好
-# 先在num_topics 固定的时候 考虑 iteration的情况 ,  画图
-
+    
 # 设置多个参数  求取笛卡尔积
 iteration_list = list(range(10,330,20)) # 16个参数
 topic_list = list(range(18,34,2))
@@ -470,27 +421,6 @@ candidate_params = [param_result_noelse.loc[param_result_noelse['topic_coherence
                     #                                                min(param_result_noelse[(param_result_noelse['topic']==32)]['topic_coherence (u_mass)'])]['iteration'].values[0]]]
 best_topic = candidate_params[0]
 best_iteration = candidate_params[1]
-
-
-#
-#
-# lda_model1 = LdaModel(corpus=corpus_noelse , num_topics= candidate_params[0][0], id2word= dictionary_noelse ,iterations=candidate_params[0][1])
-# lda_model2 = LdaModel(corpus=corpus_noelse , num_topics= candidate_params[1][0], id2word = dictionary_noelse ,iterations = candidate_params[1][1])
-#
-# topic_coherence1 = CoherenceModel(model=lda_model1,texts=text_sentence_noelse,corpus=corpus_noelse,dictionary=dictionary_noelse
-#                                   ,coherence = 'u_mass').get_coherence()
-# topic_coherence2 = CoherenceModel(model=lda_model2,texts=text_sentence_noelse,corpus=corpus_noelse,dictionary=dictionary_noelse
-#                                   ,coherence = 'u_mass').get_coherence()
-#
-# print('the topic coherence of model1 VS model2 : {0} VS {1}'.format(topic_coherence1,topic_coherence2))
-#
-# if  topic_coherence1 < topic_coherence2:
-#     best_topic = lda_model1.num_topics
-#     best_iteration = lda_model1.iterations
-# else:
-#     best_topic = lda_model2.num_topics
-#     best_iteration = lda_model2.iterations
-
 
 model_lda =LdaModel(corpus=corpus_noelse,num_topics=best_topic,id2word=dictionary_noelse,
                     alpha=0.01,iterations=best_iteration)
