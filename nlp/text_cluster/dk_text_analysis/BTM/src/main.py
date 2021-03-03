@@ -71,7 +71,7 @@ if __name__ ==  "__main__":
     beta = 0.01
     n_iter = 300
     save_step = 100
-    abs_path='C:/Users/bdruijiali/Desktop/团队/data/activity_relate/BTM'
+    abs_path='***'
     dir = abs_path+"/output/"
     input_dir = abs_path+"/input/"
     model_dir = dir + "model/"
