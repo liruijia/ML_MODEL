@@ -81,7 +81,7 @@
          cluster 0 : 担心资金安全
          cluster 1 : 自动扣款额度问题
          cluster 2 : 缴费失败
-         cluster 3 : 蚂蚁森林 + 扣费金额问题
+         cluster 3 :  扣费金额问题
          cluster 4 ：扣费顺序 + 扣款重复 + 扣款失败
          cluster 5 ：未扣款成功
          cluster 8 ： 有余额仍扣款
