@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-# 在原来的基础上求 pz_d 概率
 from .pvec import *
 import numpy as np
 from .doc import Doc
@@ -91,13 +90,11 @@ class Model():
         for index ,biterm in enumerate(self.bs):
             k = uni_sample(self.K)
             self.assign_biterm_topic(biterm,k)
-        # 根据bs求相应B的个数，同时根据doc_pt 求解相应的len_doc
         self.total_ds = {}
         for  index, bitermb in enumerate(self.bs):
             if bitermb not in self.total_ds.keys():
                 self.total_ds[bitermb]=index
         # self.len_biterm = len(self.total_ds)
-        # 更新相应的矩阵初始值
         # self.pz_b = np.zeros((self.len_biterm ,self.K))
         # self.pb_d = np.zeros((self.len_doc , self.len_biterm))
         # self.nd_b = np.zeros((self.len_doc ,self.len_biterm))
@@ -129,7 +126,7 @@ class Model():
 
         # print('********保存bs******')
         # print('the length of ds ' , len(self.bs))
-        # save_path = 'C:/Users/bdruijiali/Desktop/团队/activity_relate/BTMpy/output/bs.txt'
+        # save_path = '***'
         # with open(save_path, 'w',encoding = 'utf-8') as f:
         #     for b in self.bs:
         #         f.write(b)
@@ -219,8 +216,6 @@ class Model():
         return new
 
     def __SentenceProcess(self, sentence,sentence_type='wordid_list'):
-        # 对于传进来的sentence若其为未经过任何处理的句子则需要使用textProcessing处理
-        # 如果传进来的sentence是wordid组成的列表，则不需要textProcessing处理
         if sentence_type == 'text':
             words = self.__textProcessing(sentence)
             words_id = []
@@ -232,7 +227,6 @@ class Model():
         return self.build_Biterms(words_id)
 
     def sentence_topic(self, sentence, sentence_type = 'wordid_list',topic_num=1, min_pro=0.02):
-        ## 基于原始的LDA的方法，LDA求sentence-topic的时候的p(z|d)  利用LDA进行求解，主要借助d 与 word之间的关系
         # p(z|d)= p(z|w)p(w|d)
         words_id = self.__SentenceProcess(sentence,sentence_type)
         print(words_id,'***')
@@ -263,7 +257,6 @@ class Model():
         return result[:topic_num]
 
     def infer_sentence_topics(self, sentence, sentence_type='wordid_list',topic_num=1):
-        # 使用BTM方法进行 主要借助于 d与b 之间的联系
         # p(z|d) = p(z|b)p(b|d)
         sentence_biterms = self.__SentenceProcess(sentence,sentence_type)
         topic_pro = [0] * self.K
