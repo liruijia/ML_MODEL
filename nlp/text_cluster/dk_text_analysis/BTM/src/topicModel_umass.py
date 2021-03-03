@@ -1,12 +1,5 @@
 # -*- coding: utf-8 -*-
 '''
-进行模型估计的部分
-    实现perplexity / u_mass 看哪一个比较好实现吧，时隔这么久 没想到又要写这个函数了  😓
-topic_coherence:
-   相比较更加好求一点，topic_coherence 主题一致性 其主要衡量了在同一主题下的词汇的紧密（相似程度），因此在求解topic_coherence的
-   时候则找到 同一个主题下的相同的word  再在所有的语料中去遍历相似度
-
-btm 主要考虑的是biterm 而 lda则考虑的是word
     :param   topic-word 、 corpus
     :return  u_mass
 '''
@@ -51,10 +44,9 @@ class topicModel_umass():
             self.top_words[i]=top_w
 
     def __get_top_word_pairs(self,topic_id):
-        ''' 获取每一个topic的key_word_pair'
+        ''' 
             :param : topic_id
             :return : top_words_pair
-            只是针对于某一个topicid 求取相应的words_pair
         '''
         words_list =self.top_words[topic_id]
         n=len(words_list)
@@ -64,7 +56,7 @@ class topicModel_umass():
                 words_pair.append((words_list[i],words_list[j]))
         print('******* the length of the keyword of topic{0}  is {1}  \r\n'.format(topic_id , len(words_list)))
         print('******* the length of the words_pais of topic{0} is {1} \r\n'.format(topic_id , len(words_pair)))
-        # 正常来说，有n个key_words 则有n(n-1)/2
+
         return  words_pair
 
     def __log_conditional_probability(self,widi ,widj , emplsion):
@@ -97,7 +89,7 @@ class topicModel_umass():
         return st[0] if len(st)==1 else tuple(st)
 
     def topic_umass(self,doc_dir,pw_z,pw_z_dir=None,with_std=False, with_support=False):
-        '''有一个问题，umass的计算可以是直接最后将所有topic所对应的score进行求和，也可以是经过一定的计算
+        '''
            :param : with_Std  bool 是否结算std
            :param : with_support bool  是否返回score的长度
            :return : umass
